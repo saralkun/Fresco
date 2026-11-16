@@ -1,105 +1,41 @@
 # FReSCO
 
-This release contains the FReSCO training and evaluation implementation used
-for Subject 460. It is built on
-[MeGA](https://github.com/conallwang/MeGA) and expects the preprocessed
-NeRSemble data released for MeGA, together with the required FLAME assets and a
-pretrained canonical hair checkpoint.
+**Frequency-Spatial Consistent Optimization for Fine-Grained Head Avatar Modeling**  
+CVPR 2026
 
-## Environment and data
+This repository contains the official implementation of FReSCO for training and evaluating dynamic head avatars on NeRSemble. FReSCO combines image-space frequency supervision with UV-space consistency on a hybrid mesh¨CGaussian representation.
 
-Use the MeGA-compatible `mega` Conda environment. Dataset, FLAME, initial-point,
-and pretrained-hair paths are read from the selected YAML configuration. The
-Subject 460 configuration used by the server run is:
+## Setup and Data
 
-```text
-configs/nersemble/460/full.yaml
-```
+Follow the [MeGA setup instructions](https://github.com/conallwang/MeGA#environment) to configure the Python and CUDA environment. Download the preprocessed NeRSemble data for your chosen subject from [MeGA's data release](https://github.com/conallwang/MeGA#data--pretrained-models).
 
-Update its machine-specific paths before running on a new server. Local data,
-checkpoints, caches, logs, and evaluation outputs are excluded by `.gitignore`.
+Run the commands below from the repository root.
 
 ## Training
 
-Subject 460 is launched by the server training entry point:
+We use NeRSemble Subject 460 as an example. Set the dataset and model asset paths in `configs/nersemble/460/full.yaml`, then run:
 
 ```bash
-PROJECT_DIR=/path/to/fresco_release \
-OUTPUT_ROOT=/path/to/checkpoints/fresco_460_100ep \
-RUN_NAME=subject460_100ep \
-GPU_ID=0 \
-bash scripts/train_fresco_460_100ep.sh --run
+conda activate mega
+GPU_ID=0 NUM_WORKERS=2 bash ./scripts/train_fresco_460_100ep.sh --run
 ```
 
-The same script supports command inspection, background execution, and strict
-resume without changing its training logic:
+Use `--dry-run` to preview the launch command and training schedule. The script resumes from `checkpoint_latest.pth` if one exists in the run directory. Set a new `RUN_NAME` to start a fresh run.
 
-```bash
-PROJECT_DIR=/path/to/fresco_release bash scripts/train_fresco_460_100ep.sh --dry-run
-PROJECT_DIR=/path/to/fresco_release SESSION_NAME=fresco460 bash scripts/train_fresco_460_100ep.sh --screen
-PROJECT_DIR=/path/to/fresco_release RESUME=/path/to/checkpoint_latest.pth bash scripts/train_fresco_460_100ep.sh --run
-```
+For another subject, prepare a configuration with the corresponding data and initialization assets, then specify its path with `CONFIG_PATH` and use a separate `RUN_NAME`.
 
-The release implementation uses this fixed six-stage, 100-epoch curriculum:
-
-| Epochs | LF-IMG | Cross-view UV | Seam pair | HF-IMG |
-| --- | ---: | ---: | ---: | ---: |
-| `[0,10)` | 0.25 | 0 | 0 | 0 |
-| `[10,30)` | 0.15 | 0.01 | 0 | 0 |
-| `[30,48)` | 0.10 | 0.02 | 0 | 0 |
-| `[48,70)` | 0.05 | 0.03 | 0.05 | 0 |
-| `[70,90)` | 0.02 | 0.03 | 0.02 | 0.05 |
-| `[90,100)` | 0.01 | 0.02 | 0.01 | 0.05 |
-
-The Seam TV coefficient remains `0.004`; the scheduled Seam value is the pair
-coefficient used inside the Seam loss. This released 100-epoch, six-stage run
-differs from the 110-epoch, three-stage training protocol described in the
-paper. Use the table above when reproducing the released Subject 460 run.
-
-The trainer writes the effective configuration to `params.yaml` in the run
-directory and stores optimized FLAME parameters in `flame_params.npz` beside
-the checkpoint. Both files are required for evaluation and resume behavior.
+**Release configuration.** The Subject 460 example uses a six-stage, 100-epoch schedule with fixed loss weights within each stage. The paper and supplementary material describe a 110-epoch schedule with a cosine ramp-up for high-frequency supervision.
 
 ## Evaluation
 
-The server evaluation script uses `scripts/metrics.sh`. Set its `CKPT_PATH` and
-GPU for the target machine, then run:
+Set the checkpoint path, split (`val` or `test`), and GPU in `scripts/metrics.sh`. Keep `params.yaml` and `flame_params.npz` from the same training run alongside the checkpoint.
 
 ```bash
-bash scripts/metrics.sh
+bash ./scripts/metrics.sh
 ```
 
-Its effective command is:
+The script renders the selected split and computes image-quality metrics.
 
-```bash
-CUDA_VISIBLE_DEVICES=1 python metrics.py \
-  --checkpoint /path/to/checkpoint_latest.pth \
-  --split test
-```
+## Acknowledgements
 
-`metrics.py` loads `params.yaml` from the checkpoint directory, restores model
-and optimized FLAME weights, renders the selected split, and computes the
-existing MeGA-aligned metrics.
-
-## Tests
-
-After restoring all authoritative server-side companion files and activating
-the `mega` environment, tests can be run with:
-
-```bash
-python -m unittest discover -s tests -p 'test_*.py'
-bash -n scripts/*.sh stage_train_460_J1J2.sh
-```
-
-The release includes the schedule, dataset, smoke-test, comparison, and FLAME
-runtime assets copied from the authoritative server tree. Real-batch tests
-additionally require the complete MeGA CUDA environment, nvdiffrast, configured
-NeRSemble data, and model checkpoints.
-
-## Attribution and licensing
-
-This implementation is based on MeGA and contains FLAME-derived integration
-code with its existing copyright notices retained. The downloaded server tree
-did not contain a repository-level license file. Before public distribution,
-add the project license authorized by the code owners and comply with the
-separate terms for MeGA, FLAME, NeRSemble, and all third-party dependencies.
+FReSCO builds on the [MeGA implementation](https://github.com/conallwang/MeGA). We thank the MeGA authors for sharing their code and the preprocessed NeRSemble data used for training and evaluation, and the NeRSemble authors for providing the original dataset.
