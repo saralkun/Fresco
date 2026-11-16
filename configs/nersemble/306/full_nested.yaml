@@ -1,0 +1,154 @@
+data:
+  canonical_flame_path: /home/wyq/zsk/work3_data/nersemble/preprocess/306/306_EMO-3_v16_DS2-0.5x_lmkSTAR_teethV3_SMOOTH_offsetS_whiteBg_maskBelowLine/flame_param/00000.npz
+  img_h: 802
+  img_w: 550
+  load_images: false
+  num_workers: 16
+  per_gpu_batch_size: 16
+  root: /home/wyq/zsk/work3_data/nersemble/preprocess/306/UNION10_306_EMO1234EXP234589_v16_DS2-0.5x_lmkSTAR_teethV3_SMOOTH_offsetS_whiteBg_maskBelowLine
+exp:
+  debug_run:
+    enable: true
+    gradcheck_j1: false
+    j2_uv_bake: false
+    j2_uv_prereq: true
+    max_steps: 1000
+    show_loss_breakdown: true
+  lf_img:
+    enable: true
+    kernel: 5
+    lambda: 0.1
+    loss: charbonnier
+  lf_uv:
+    enable: true
+    force_bake_now: true
+    loss:
+      colorspace: rgb
+      enable: true
+      gaussian_kernel: 7
+      gaussian_sigma: 1.2
+      type: charbonnier
+      vis_mask_min_cov: 0.02
+      weight: 0.05
+    seam:
+      band_px: 2
+      edge: sobel
+      edge_tau: 0.05
+      enable: false
+      min_cov: 0.02
+      tv_type: l1
+      vis_every: 10000
+      weight: 0.0
+    uv_res: 1024
+    vis_every: 10000
+  logging:
+    mute_print: false
+    selective: false
+    silent: false
+flame:
+  add_teeth: true
+  enable_offsets: true
+  ignore_faces: /home/wyq/zsk/work3_data/MeGA/face-data/flame/lower_neck_bottom_face_idcs.npy
+  lmk_embedding_path: /home/wyq/zsk/work3_data/MeGA/face-data/flame2023/landmark_embedding_with_eyes.npy
+  model_path: /home/wyq/zsk/work3_data/MeGA/face-data/flame2023/flame2023.pkl
+  move_eyes: false
+  n_expr: 100
+  n_pose: 15
+  n_shape: 300
+  offsets_ignore_parts:
+  - null
+  optimize_params: true
+  parts_path: /home/wyq/zsk/work3_data/MeGA/face-data/flame/FLAME_masks_mouth.pkl
+  subdivision: 1
+  xyz_cond: false
+gs:
+  K: 8
+  deform_attr:
+  - xyz
+  - rotation
+  - scaling
+  - opacity
+  - features_dc
+  deform_layers:
+  - 256
+  - 256
+  deform_lr: 0.001
+  deform_weightnorm: false
+  densification_interval: 200
+  densify_from_iter: 500
+  densify_grad_threshold: 0.0002
+  densify_until_iter: 15000
+  enable_aiap: true
+  enable_reset: false
+  feature_lr: 0.0025
+  init_pts: /home/wyq/zsk/work3_data/nersemble/preprocess/306/init_pts_150000.npy
+  opacity_lr: 0.05
+  opacity_reset_interval: 3000
+  pe:
+    num_freqs: 6
+  percent_dense: 0.002
+  position_lr_delay_mult: 0.01
+  position_lr_final: 1.6e-06
+  position_lr_init: 0.00016
+  position_lr_max_steps: 30000
+  pretrain: /home/wyq/zsk/work3/checkpoints/mega/0905/train_306_b8_MeGA_hair/checkpoint_reset.pth
+  rotation_lr: 0.001
+  scaling_lr: 0.005
+  sh_degree: 3
+  split_inteval: 100
+  split_rate_threshold: 2
+  upSH: 1000
+pipe:
+  compute_cov3D_python: false
+  convert_SHs_python: false
+  debug: false
+  neutral_hair: false
+training:
+  depth_thres: 5
+  enable_densify: true
+  enc:
+    mode: texture
+  epochs: 80
+  eval_interval: 5000
+  gpus: '2'
+  head_stage_loss:
+  - head
+  joint_stage_loss:
+  - hair
+  - joint
+  lambda_aiap:
+    cov: 100000.0
+    xyz: 1000.0
+  lambda_depth:
+    head: 1.0
+  lambda_features_dc: 10.0
+  lambda_lf_img: 0.1
+  lambda_mesh:
+    edges: 300.0
+    laplacian: 150.0
+    normal: 0.1
+    verts_scale: 1.0
+  lambda_normal:
+    head: 2.0
+  lambda_opacity: 10.0
+  lambda_rgb: 1.0
+  lambda_rotation: 10.0
+  lambda_scaling: 10.0
+  lambda_silh:
+    hair: 0.2
+    solid_hair: 0.1
+  lambda_ssim: 0.2
+  lambda_update_list: []
+  learning_rate: 0.001
+  neural_texture: true
+  pe: LPE
+  pretrained_checkpoint_path: null
+  stages:
+  - head
+  - joint
+  stages_epoch:
+  - 50
+  step: []
+  tex_ch: 12
+  tex_size: 1024
+  visual_interval: 200

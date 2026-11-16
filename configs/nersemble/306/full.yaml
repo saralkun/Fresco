@@ -1,0 +1,273 @@
+# Data
+data.root: '/home/wyq/zsk/work3_data/nersemble/preprocess/306/UNION10_306_EMO1234EXP234589_v16_DS2-0.5x_lmkSTAR_teethV3_SMOOTH_offsetS_whiteBg_maskBelowLine'
+data.canonical_flame_path: '/home/wyq/zsk/work3_data/nersemble/preprocess/306/306_EMO-3_v16_DS2-0.5x_lmkSTAR_teethV3_SMOOTH_offsetS_whiteBg_maskBelowLine/flame_param/00000.npz'
+data.per_gpu_batch_size: 16
+data.num_workers: 16
+data.load_images: False
+data.img_w: 550
+data.img_h: 802
+
+# Training
+training.enc.mode: texture
+training.enable_densify: True
+training.neural_texture: True
+training.tex_size: 1024
+training.tex_ch: 12
+training.gpus: "2"
+training.learning_rate: 0.001
+training.step: []
+training.visual_interval: 200
+training.eval_interval: 5000
+training.epochs: 80
+training.pretrained_checkpoint_path: null
+training.pe: 'LPE'
+training.pe.num_freqs: 8
+training.pe.log_sampling: True
+training.pe.include_input: True
+
+training.lambda_update_list: []
+# general
+training.lambda_rgb: 1.0
+training.lambda_ssim: 0.2
+
+# hair
+training.lambda_rgb.hair: 1.0
+training.lambda_silh.hair: 0.2
+training.lambda_silh.solid_hair: 0.1
+
+training.lambda_rotation: 10.0
+training.lambda_scaling: 10.0
+training.lambda_opacity: 10.0
+training.lambda_features_dc: 10.0
+training.lambda_aiap.xyz: 1000.0
+training.lambda_aiap.cov: 100000.0
+
+# head
+training.lambda_rgb.head: 1.0
+training.lambda_depth.head: 1.0
+training.lambda_normal.head: 2.0
+training.lambda_mesh.laplacian: 150.0
+training.lambda_mesh.normal: 0.1
+training.lambda_mesh.edges: 300.0
+training.lambda_mesh.verts_scale: 1.0
+training.lambda_lf_img: 0.1
+
+training.depth_thres: 5
+
+# Stages Control
+training.stages:
+- head
+- joint
+training.stages_epoch:
+- 50
+training.head_stage_loss:
+- head
+training.joint_stage_loss:
+- hair
+- joint
+
+# FLAME
+flame.optimize_params: True
+
+flame.subdivision: 1
+flame.subdivision.mouth: 0
+flame.add_teeth: True
+flame.model_path: "/home/wyq/zsk/work3_data/MeGA/face-data/flame2023/flame2023.pkl"
+flame.lmk_embedding_path: "/home/wyq/zsk/work3_data/MeGA/face-data/flame2023/landmark_embedding_with_eyes.npy"
+flame.parts_path: "/home/wyq/zsk/work3_data/MeGA/face-data/flame/FLAME_masks_mouth.pkl"
+flame.ignore_faces: "/home/wyq/zsk/work3_data/MeGA/face-data/flame/lower_neck_bottom_face_idcs.npy"
+flame.n_shape: 300
+flame.n_expr: 100
+flame.n_pose: 15  # full pose
+
+# FLAME Offsets
+flame.enable_offsets: True
+flame.move_eyes: False
+flame.offsets_ignore_parts:
+- 
+
+# FLAME texture
+flame.xyz_cond: False
+
+# Gaussian
+gs.pretrain: '/home/wyq/zsk/work3/checkpoints/mega/0905/train_306_b8_MeGA_hair/checkpoint_reset.pth'
+gs.sh_degree: 3
+gs.init_pts: "/home/wyq/zsk/work3_data/nersemble/preprocess/306/init_pts_150000.npy"
+gs.percent_dense: 0.002
+gs.position_lr_init: 0.00016
+gs.position_lr_final: 0.0000016
+gs.position_lr_delay_mult: 0.01
+gs.position_lr_max_steps: 30000
+gs.feature_lr: 0.0025
+gs.opacity_lr: 0.05
+gs.scaling_lr: 0.005
+gs.rotation_lr: 0.001
+
+gs.upSH: 1000
+gs.densify_from_iter: 500
+gs.densify_until_iter: 15000
+gs.densification_interval: 200
+gs.opacity_reset_interval: 3000
+gs.densify_grad_threshold: 0.0002
+gs.enable_reset: False
+gs.split_inteval: 100
+gs.split_rate_threshold: 2
+
+gs.deform_weightnorm: False
+gs.deform_lr: 0.001
+gs.pe.num_freqs: 6
+gs.deform_attr:
+- xyz
+- rotation
+- scaling
+- opacity
+- features_dc
+
+gs.deform_layers:
+- 256
+- 256
+
+gs.enable_aiap: True
+gs.K: 8
+
+# Pipe
+pipe.convert_SHs_python: False
+pipe.compute_cov3D_python: False
+pipe.debug: False
+pipe.neutral_hair: False
+
+# Debug and experimental features
+exp:
+  logging:
+    silent: false        # 完全静默：true=静音（不落图/不保存可视化）
+    selective: false     # 选择性静默：true=只抑制J1/J2可视化，保留原始训练可视化
+    mute_print: false    # 若也想静音控制台，设 true
+  
+  debug_run:
+    enable: true
+    max_steps: 1000
+    gradcheck_j1: False  # 梯度归属检查开关
+    j2_uv_prereq: True   # J2 UV预检开关
+    j2_uv_bake: False    # J2 UV烘回开关
+    show_loss_breakdown: true  # 显示损失分解开关
+  
+  lf_uv:
+    enable: true
+    uv_res: 1024         # 作为兜底数值；自动取到 T_di 时会显示 src=T_di
+    force_bake_now: true # 每步都bake，测试基础性能
+    every: 4             # 每步都执行，不降频
+    vis_every: 10000    # 每隔多少步保存一次可视化
+    cache:
+      enable: false     # 关闭缓存，测试基础性能
+      keep_uv_gt_mask: false
+      # 说明：关闭缓存，测试修复后的基础性能
+    loss:
+      enable: true
+      type: "charbonnier"  # 可选 "l1"|"deltae"
+      colorspace: "rgb"     # 当 type=="deltae" 时切到 "lab"
+      gaussian_kernel: 7
+      gaussian_sigma: 1.2
+      weight: 0.05
+      vis_mask_min_cov: 0.02  # 掩膜覆盖率过低则本步跳过
+      scale_by_every: true    # ⭐ 用于保持期望梯度规模：effective_weight = weight * every
+    seam:
+      enable: true      # 启用接缝正则化
+      weight: 0.02       # 总权重（向后兼容）
+      weight_pair: 0.02   # 主项：接缝两侧配对一致性权重
+      weight_tv: 0.004    # 辅项：接缝邻域 TV 权重
+      min_vis: 0.01      # 最小可见性阈值（降低以适应腐蚀后的覆盖率）
+      band_px: 2         # 窄带宽度（像素）
+      apply_on: "rgb"     # 应用目标：chroma|albedo|feature|rgb
+      tv_type: "l1"     # "l1" | "charbonnier"
+      edge: "sobel"     # 边缘检测方法（先支持 "sobel"）
+      edge_tau: 0.05    # 边缘幅值阈值（0~1），太低会过宽
+      min_cov: 0.02     # 可见UV占比过低时跳过
+      vis_every: 10000  # 每隔多少步保存一次可视化
+  
+  lf_img:
+    enable: true
+    kernel: 9           # 先用 5，真实使用时可通过 CLI 覆写
+    loss: l1            # FReSCO Eq. (3)
+    lambda: 0.25         # joint 期谨慎起步；后续再评估是否提高
+  
+  hf_img:
+    enable: true        # 启用高频图像损失
+    mode: charbonnier   # 损失类型: l1, l2, charbonnier
+    ksize: 5           # 高通滤波核大小
+    sigma: 1.2         # 高斯sigma
+    edge_method: sobel # 边缘检测方法: sobel, scharr, laplacian
+    edge_threshold: 0.1 # 边缘检测阈值（已弃用，使用分位数）
+    edge_weight: 2.0   # 边缘区域权重
+    base_weight: 1.0   # 基础权重
+    lambda: 0.1        # 高频损失权重
+    # 新增边界带构造参数
+    pre_smooth_kernel: 5    # 预平滑核大小
+    pre_smooth_sigma: 1.0   # 预平滑sigma
+    edge_percentile: 95.0   # 边缘检测分位数阈值（已弃用）
+    edge_sharpness: 10.0    # 软权重锐化因子
+    edge_dilate_kernel: 3   # 膨胀核大小
+    # 覆盖率目标参数
+    cov_target: 0.05        # 目标覆盖率 [0.03, 0.08]
+    p_init: 94.0           # 初始百分位
+    p_min: 85.0            # 搜索范围最小值
+    p_max: 99.0            # 搜索范围最大值
+    # 细带膨胀参数
+    band_dilate_kernel: 3   # 细带膨胀核大小 (3=膨胀1px, 5=膨胀2px)
+    # 软权重参数
+    soft_span: 0.1          # 软化跨度
+    edge_gamma: 2.0         # γ倍增因子 (推荐1.5~3.0，从2.0起步)
+    # 有效区域限制参数
+    apply_valid_mask: true  # 是否应用有效区域mask，避免背景噪声参与
+# J1/J2实验配置
+exp.lf_img.enable: true
+exp.lf_img.lambda: 0.1
+exp.lf_img.sigma: -1.0                    # <=0 uses kernel/6, matching the existing LF scale
+exp.lf_uv.enable: true
+exp.lf_uv.force_bake_now: true
+exp.lf_uv.loss.enable: true
+exp.lf_uv.loss.weight: 0.05
+
+# UV监督接缝正则化配置 (扁平配置，与代码读取路径一致)
+exp.lf_uv.seam.enable: true
+exp.lf_uv.seam.weight: 0.02                # 接缝损失权重
+exp.lf_uv.seam.band_px: 2                  # 接缝邻域膨胀像素
+exp.lf_uv.seam.tv_type: "l1"               # TV损失类型
+exp.lf_uv.seam.edge: "sobel"               # 边缘检测方法
+exp.lf_uv.seam.edge_tau: 0.05              # 边缘检测阈值
+exp.lf_uv.seam.min_cov: 0.02               # 最小覆盖率
+exp.lf_uv.seam.vis_every: 10000           # 可视化频率
+
+# J4高频图像损失配置 (扁平配置，与代码读取路径一致)
+exp.hf_img.enable: true                    # 启用高频图像损失
+exp.hf_img.mode: "charbonnier"             # 损失类型: l1, l2, charbonnier
+exp.hf_img.ksize: 5                        # 高通滤波核大小
+exp.hf_img.sigma: 1.2                      # 高斯sigma
+exp.hf_img.edge_method: "sobel"            # 边缘检测方法: sobel, scharr, laplacian
+exp.hf_img.edge_threshold: 0.1             # 边缘检测阈值（已弃用，使用分位数）
+exp.hf_img.edge_weight: 2.0                # 边缘区域权重
+exp.hf_img.base_weight: 1.0                # 基础权重
+exp.hf_img.lambda: 0.1                     # 高频损失权重
+exp.hf_img.kernel1: 3                      # DoG narrow Gaussian
+exp.hf_img.sigma1: 0.8
+exp.hf_img.kernel2: 5                      # DoG broad Gaussian
+exp.hf_img.sigma2: 1.2
+exp.hf_img.lambda_h1: 1.0                  # Paper does not report h1/h2; explicit equal composition
+exp.hf_img.lambda_h2: 1.0                  # Paper does not report h1/h2; explicit equal composition
+# 新增边界带构造参数
+exp.hf_img.pre_smooth_kernel: 5            # 预平滑核大小
+exp.hf_img.pre_smooth_sigma: 1.2           # 预平滑sigma
+exp.hf_img.edge_percentile: 95.0           # 边缘检测分位数阈值（已弃用）
+exp.hf_img.edge_sharpness: 10.0            # 软权重锐化因子
+exp.hf_img.edge_dilate_kernel: 3           # 膨胀核大小
+# 覆盖率目标参数
+exp.hf_img.cov_target: 0.035                # 目标覆盖率 [0.03, 0.08]
+exp.hf_img.p_init: 96.0                    # 初始百分位
+exp.hf_img.p_min: 90.0                     # 搜索范围最小值
+exp.hf_img.p_max: 99.5                     # 搜索范围最大值
+# 细带膨胀参数
+exp.hf_img.band_dilate_kernel: 3           # 细带膨胀核大小 (3=膨胀1px, 5=膨胀2px)
+# 软权重参数
+exp.hf_img.soft_span: 0.08                 # 软化跨度
+exp.hf_img.edge_gamma: 1.5                 # γ倍增因子 (推荐1.5~3.0，从2.0起步)
+# 有效区域限制参数
+exp.hf_img.apply_valid_mask: true          # 是否应用有效区域mask，避免背景噪声参与
