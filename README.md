@@ -38,4 +38,4 @@ The script renders the selected split and computes image-quality metrics.
 
 ## Acknowledgements
 
-FReSCO builds on the [MeGA implementation](https://github.com/conallwang/MeGA). We thank the MeGA authors for sharing their code and the preprocessed NeRSemble data used for training and evaluation, and the NeRSemble authors for providing the original dataset.
+FReSCO builds on the [MeGA](https://github.com/conallwang/MeGA). We thank the MeGA authors for sharing their code and the preprocessed NeRSemble data used for training and evaluation, and the NeRSemble authors for providing the original dataset.
