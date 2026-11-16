@@ -1,9 +1,9 @@
-# FReSCO
+# Fresco
 
 **Frequency-Spatial Consistent Optimization for Fine-Grained Head Avatar Modeling**  
 CVPR 2026
 
-This repository contains the official implementation of FReSCO for training and evaluating dynamic head avatars on NeRSemble. FReSCO combines image-space frequency supervision with UV-space consistency on a hybrid mesh¨CGaussian representation.
+This repository contains the official implementation of Fresco for training and evaluating dynamic head avatars on NeRSemble. Fresco combines image-space frequency supervision with UV-space consistency on a hybrid meshÂ¨CGaussian representation.
 
 ## Setup and Data
 
@@ -24,7 +24,7 @@ Use `--dry-run` to preview the launch command and training schedule. The script 
 
 For another subject, prepare a configuration with the corresponding data and initialization assets, then specify its path with `CONFIG_PATH` and use a separate `RUN_NAME`.
 
-**Release configuration.** The Subject 460 example uses a six-stage, 100-epoch schedule with fixed loss weights within each stage. The paper and supplementary material describe a 110-epoch schedule with a cosine ramp-up for high-frequency supervision.
+
 
 ## Evaluation
 
